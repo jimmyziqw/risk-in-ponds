@@ -16,7 +16,7 @@ vec4 updateHeight(vec4 info, sampler2D map, vec2 coord, vec2 delta) {
     ) * 0.25;
     float acc = (average - info.r) * 2.0; //2.0 stablibility s2/c2 >= delta t
     info.g += acc;
-    info.g *= 0.991;  // Damp
+    info.g *= 0.90;  // Damp
     info.r += info.g ;
     return info;
 } 
@@ -39,15 +39,15 @@ uniform bool isInit;
 
 void main() {
     vec4 info;
-    if (isInit) {
-        info = vec4(0.5,0.0,0.0,1.0);
-    } else {
-        info = texture(map, vUv);    
-        info = updateHeight(info, map, vUv, delta);// update first.    
-        info = updateNormals(info, map, vUv, delta); // be careful of the order
-        info = getDrop(info, vUv, center, radius, strength);
+    // if (isInit) {
+    //     info = vec4(0.5,0.0,0.0,1.0);
+    // } else {
+    info = texture(map, vUv);    
+    info = updateHeight(info, map, vUv, delta);// update first.    
+    info = updateNormals(info, map, vUv, delta); // be careful of the order
+    info = getDrop(info, vUv, center, radius, strength);
 
-    }
+    // }
     gl_FragColor = vec4(info);
 }
 

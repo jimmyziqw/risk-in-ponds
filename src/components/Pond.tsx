@@ -1,12 +1,11 @@
 import * as THREE from "three";
-// import { fragmentShader, vertexShader } from "../shaders/frameBuffer.glsl";
-import { fragmentShader as fs, vertexShader as vs } from "../shaders/water.glsl";
 import { useRef } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
 import { useTexture } from "@react-three/drei";
 import vertexShader from "../shaders/framebuffer_vertex.glsl"
 import fragmentShader from "../shaders/framebuffer_fragment.glsl"
-
+import vs from "../shaders/pond_vertex.glsl"
+import fs from "../shaders/pond_fragment.glsl"
 export function Pond() {
 	const ref = useRef<THREE.Mesh>(null);
 	const { scene, raycaster, mouse, camera } = useThree();
@@ -122,21 +121,9 @@ export function Pond() {
 	return (
 		<group visible={true}>
 			<mesh ref={ref} material={material} rotation={[-Math.PI/2,0,0]}>
-				<planeGeometry args={[3,3,64,64]} />
+				<planeGeometry args={[5,5,64,64]} />
 			</mesh>
-            {/* <mesh rotation={[-Math.PI/2,0,0]}>
-				<planeGeometry args={[3,3,64,64]} />
-                <meshBasicMaterial color="orange"/>
-			</mesh> */}
 		</group>
 	);
 }
 
-// function minMaxScaler(x: number, min: number, max: number) {
-//     if (max === min) {
-//         console.warn("zero division in minMaxScaler");
-//         return 1;
-//     } else if (x >= max) return 1.0;
-//     else if (x <= min) return 0.0;
-//     return (x - min) / (max - min);
-// }

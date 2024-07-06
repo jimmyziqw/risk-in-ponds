@@ -3,6 +3,7 @@ import { useCallback, useState } from "react";
 import useRespondAspectChange from "./utils/useRespondAspectChange.ts";
 import { Pond } from "./components/Pond.tsx";
 import { TestCube } from "./components/TestCube.tsx";
+import { Ship } from "./components/Ship.tsx";
 // import { StandardMesh } from "./components/StandardMesh.tsx";
 
 export function Scene() {
@@ -15,6 +16,7 @@ export function Scene() {
 				<meshBasicMaterial color="orange"/>
 			</mesh> */}
 			<TestCube/>
+			<Ship/>
  
 
 			{/* <Background name="background" texturePath="textures/solarium5.jpg" />
