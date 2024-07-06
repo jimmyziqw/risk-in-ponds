@@ -1,11 +1,12 @@
 import * as THREE from "three";
-import { useRef } from "react";
+import { useRef, useEffect } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
 import { useTexture } from "@react-three/drei";
 import vertexShader from "../shaders/framebuffer_vertex.glsl";
 import fragmentShader from "../shaders/framebuffer_fragment.glsl";
 import vs from "../shaders/pond_vertex.glsl";
 import fs from "../shaders/pond_fragment.glsl";
+
 export function Pond({ shipRef }: { shipRef: THREE.Mesh}) {
 	const ref = useRef<THREE.Mesh>(null);
 	const { scene, raycaster, mouse, camera } = useThree();
@@ -83,22 +84,42 @@ export function Pond({ shipRef }: { shipRef: THREE.Mesh}) {
 	};
 
 	let time = 0;
-	const updateShipPosition = (keyDown: boolean) => {
-		if (!ref.current) return;
-		if (shipRef.current) {
-			const shipPosition = shipRef.current.position;
-			const material = bufferObject.material as THREE.ShaderMaterial;
-			const uv = new THREE.Vector2(shipPosition.x / 3 + 0.5, -shipPosition.z / 3 + 0.5);
-			if (!keyDown) {
-				material.uniforms.center.value.set(null);
-				// console.log("not key down")
-			} else {
-				material.uniforms.center.value = uv;
-				console.log("key down")
-			}
+	const keyState: { [key: string]: boolean } = {};
+
+	const updateShipPosition = () => {
+		if (!ref.current || !shipRef.current) return;
+		const shipPosition = shipRef.current.position;
+		const material = bufferObject.material as THREE.ShaderMaterial;
+		const uv = new THREE.Vector2(shipPosition.x / 3 + 0.5, -shipPosition.z / 3 + 0.5);
+
+		if (Object.values(keyState).some(value => value)) {
+			material.uniforms.center.value = uv;
+			// console.log("key down")
+		} else {
+			material.uniforms.center.value.set(null);
 		}
 	};
-	
+
+	useEffect(() => {
+		const handleKeyDown = (event: KeyboardEvent) => {
+			keyState[event.key] = true;
+			updateShipPosition();
+		};
+
+		const handleKeyUp = (event: KeyboardEvent) => {
+			keyState[event.key] = false;
+			updateShipPosition();
+		};
+
+		window.addEventListener('keydown', handleKeyDown);
+		window.addEventListener('keyup', handleKeyUp);
+
+		return () => {
+			window.removeEventListener('keydown', handleKeyDown);
+			window.removeEventListener('keyup', handleKeyUp);
+		};
+	}, []);
+
 	useFrame(({ gl, camera }, delta) => {
 		if (ref.current) {
 			time += delta;
@@ -120,7 +141,11 @@ export function Pond({ shipRef }: { shipRef: THREE.Mesh}) {
 			gl.setRenderTarget(null);
 			gl.render(scene, camera);
 		}
+
+		// Update ship position every frame
+		updateShipPosition();
 	});
+
 	let isDragging = false;
 	document.onmousedown = function () {
 		handlePointerEvent(true);
@@ -133,13 +158,7 @@ export function Pond({ shipRef }: { shipRef: THREE.Mesh}) {
 	document.onmousemove = function () {
 		if (isDragging) handlePointerEvent(true);
 	};
-	document.onkeydown = function () {
-		// console.log("keydown");
-		updateShipPosition(true);
-	};
-	document.onkeyup = function () {
-		updateShipPosition(false);
-	};
+
 	return (
 		<group visible={true}>
 			<mesh ref={ref} material={material} rotation={[-Math.PI / 2, 0, 0]}>
