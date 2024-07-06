@@ -6,7 +6,7 @@ import vertexShader from "../shaders/framebuffer_vertex.glsl";
 import fragmentShader from "../shaders/framebuffer_fragment.glsl";
 import vs from "../shaders/pond_vertex.glsl";
 import fs from "../shaders/pond_fragment.glsl";
-export function Pond({ shipRef }) {
+export function Pond({ shipRef }: { shipRef: THREE.Mesh}) {
 	const ref = useRef<THREE.Mesh>(null);
 	const { scene, raycaster, mouse, camera } = useThree();
 	const bufferScene = new THREE.Scene();
@@ -86,24 +86,23 @@ export function Pond({ shipRef }) {
 	const updateShipPosition = (keyDown: boolean) => {
 		if (!ref.current) return;
 		if (shipRef.current) {
-			// console.log(shipRef.current)
 			const shipPosition = shipRef.current.position;
-			// console.log(shipPosition)
 			const material = bufferObject.material as THREE.ShaderMaterial;
 			const uv = new THREE.Vector2(shipPosition.x / 3 + 0.5, -shipPosition.z / 3 + 0.5);
-			console.log(uv);
-			if (keyDown) {
+			if (!keyDown) {
 				material.uniforms.center.value.set(null);
+				// console.log("not key down")
 			} else {
 				material.uniforms.center.value = uv;
+				console.log("key down")
 			}
 		}
 	};
+	
 	useFrame(({ gl, camera }, delta) => {
 		if (ref.current) {
 			time += delta;
 			const shaderMaterial = ref.current.material as THREE.ShaderMaterial;
-			// updateShipPosition();
 			gl.setRenderTarget(read);
 			gl.render(bufferScene, cameraOrtho);
 
@@ -135,8 +134,11 @@ export function Pond({ shipRef }) {
 		if (isDragging) handlePointerEvent(true);
 	};
 	document.onkeydown = function () {
-		console.log("keydown");
-		updateShipPosition();
+		// console.log("keydown");
+		updateShipPosition(true);
+	};
+	document.onkeyup = function () {
+		updateShipPosition(false);
 	};
 	return (
 		<group visible={true}>

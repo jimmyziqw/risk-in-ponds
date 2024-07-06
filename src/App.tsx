@@ -12,14 +12,15 @@ function App() {
 				shadows
 				dpr={[1, 1.5]}
 				camera={{
-					// position: [0, 2, 5],
-					// rotation: [Math.PI / 2, 0, 0],
+					position: [0, 1, 3],
+					//rotation: [Math.PI / 2, 0, 0],
 					fov: 40,
 				}}
 			>
 				<ambientLight />
+				<directionalLight position={[-1,1,1]} intensity={2}/>
 				<Scene />
-				<OrbitControls/>
+				{/* <OrbitControls/> */}
             {process.env.NODE_ENV === "development" && <axesHelper position={[0, 0.5, 0]} />}
 			</Canvas>
 

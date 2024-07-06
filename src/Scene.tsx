@@ -6,6 +6,7 @@ import { TestCube } from "./components/TestCube.tsx";
 import { Ship } from "./components/Ship.tsx";
 // import { StandardMesh } from "./components/StandardMesh.tsx";
 import * as THREE from "three";
+import { Cloud }  from "./components/Cloud.tsx";
 export function Scene() {
 	useRespondAspectChange();
 	const shipRef = useRef<THREE.Mesh>(null);
@@ -16,7 +17,8 @@ export function Scene() {
 				<boxGeometry/>
 				<meshBasicMaterial color="orange"/>
 			</mesh> */}
-			<TestCube />
+			{/* <TestCube /> */}
+			<Cloud />
 			<Ship shipRef={shipRef}/>
  
 

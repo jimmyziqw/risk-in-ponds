@@ -20,7 +20,6 @@ void main() {
     precision highp float;
     float xOffset = vUv.x - speed*time;
     vec2 uv = vec2(xOffset, vUv.y);
-
     gl_FragColor = texture2D(map, uv);
 }`;
 
