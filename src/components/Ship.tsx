@@ -1,8 +1,8 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, MutableRefObject } from 'react';
 import { useFrame } from '@react-three/fiber';
-
-export function Ship() {
-    const shipRef = useRef();
+import * as THREE from "three";
+export function Ship({shipRef}:{shipRef:MutableRefObject<THREE.Mesh | null>}) {
+    // const shipRef = useRef();
     const movement = useRef({
         forward: false,
         backward: false,
@@ -62,14 +62,14 @@ export function Ship() {
         if (shipRef.current) {
             const position = shipRef.current.position;
             
-            if (movement.current.forward) position.z -= 0.1;
-            if (movement.current.backward) position.z += 0.1;
-            if (movement.current.left) position.x -= 0.1;
-            if (movement.current.right) position.x += 0.1;
+            if (movement.current.forward) position.z -= 0.01;
+            if (movement.current.backward) position.z += 0.01;
+            if (movement.current.left) position.x -= 0.01;
+            if (movement.current.right) position.x += 0.01;
         }
     });
     return (
-        <mesh position={[0,0.5,1]} rotation={[-Math.PI/2,0,0]} ref={shipRef}>
+        <mesh position={[0,0.01,1]} rotation={[-Math.PI/2,0,0]} ref={shipRef}>
             <meshBasicMaterial />
             <coneGeometry args={[0.05,0.2]}/>
         </mesh>

@@ -1,22 +1,23 @@
-import { useCallback, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 // import Background from "./components/Background.tsx";
 import useRespondAspectChange from "./utils/useRespondAspectChange.ts";
 import { Pond } from "./components/Pond.tsx";
 import { TestCube } from "./components/TestCube.tsx";
 import { Ship } from "./components/Ship.tsx";
 // import { StandardMesh } from "./components/StandardMesh.tsx";
-
+import * as THREE from "three";
 export function Scene() {
 	useRespondAspectChange();
+	const shipRef = useRef<THREE.Mesh>(null);
 	return (
 		<>
-			<Pond />
+			<Pond shipRef={shipRef}/>
 			{/* <mesh>
 				<boxGeometry/>
 				<meshBasicMaterial color="orange"/>
 			</mesh> */}
-			<TestCube/>
-			<Ship/>
+			<TestCube />
+			<Ship shipRef={shipRef}/>
  
 
 			{/* <Background name="background" texturePath="textures/solarium5.jpg" />

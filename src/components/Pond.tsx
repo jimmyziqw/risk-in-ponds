@@ -2,11 +2,11 @@ import * as THREE from "three";
 import { useRef } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
 import { useTexture } from "@react-three/drei";
-import vertexShader from "../shaders/framebuffer_vertex.glsl"
-import fragmentShader from "../shaders/framebuffer_fragment.glsl"
-import vs from "../shaders/pond_vertex.glsl"
-import fs from "../shaders/pond_fragment.glsl"
-export function Pond() {
+import vertexShader from "../shaders/framebuffer_vertex.glsl";
+import fragmentShader from "../shaders/framebuffer_fragment.glsl";
+import vs from "../shaders/pond_vertex.glsl";
+import fs from "../shaders/pond_fragment.glsl";
+export function Pond({ shipRef }) {
 	const ref = useRef<THREE.Mesh>(null);
 	const { scene, raycaster, mouse, camera } = useThree();
 	const bufferScene = new THREE.Scene();
@@ -30,8 +30,8 @@ export function Pond() {
 	const bufferUniforms = {
 		map: { value: null },
 		center: { value: new THREE.Vector2(0.0, 0.0) },
-		radius: { value: 0.02 },
-		strength: { value: 0.05 },
+		radius: { value: 0.01 },
+		strength: { value: 0.1 },
 		delta: { value: new THREE.Vector2(1 / 256, 1 / 256) },
 		isInit: { value: true },
 	};
@@ -74,19 +74,36 @@ export function Pond() {
 		if (intersects && intersects.length > 0) {
 			const material = bufferObject.material as THREE.ShaderMaterial;
 			const uv = intersects[0].uv;
-			if (!mouseDown) {
-				material.uniforms.center.value.set(null);
-			} else material.uniforms.center.value = uv;
+			// console.log(uv)
+
+			// if (!mouseDown) {
+			// 	material.uniforms.center.value.set(null);
+			// } else material.uniforms.center.value = uv;
 		}
 	};
 
 	let time = 0;
-
+	const updateShipPosition = (keyDown: boolean) => {
+		if (!ref.current) return;
+		if (shipRef.current) {
+			// console.log(shipRef.current)
+			const shipPosition = shipRef.current.position;
+			// console.log(shipPosition)
+			const material = bufferObject.material as THREE.ShaderMaterial;
+			const uv = new THREE.Vector2(shipPosition.x / 3 + 0.5, -shipPosition.z / 3 + 0.5);
+			console.log(uv);
+			if (keyDown) {
+				material.uniforms.center.value.set(null);
+			} else {
+				material.uniforms.center.value = uv;
+			}
+		}
+	};
 	useFrame(({ gl, camera }, delta) => {
 		if (ref.current) {
 			time += delta;
 			const shaderMaterial = ref.current.material as THREE.ShaderMaterial;
-
+			// updateShipPosition();
 			gl.setRenderTarget(read);
 			gl.render(bufferScene, cameraOrtho);
 
@@ -117,13 +134,15 @@ export function Pond() {
 	document.onmousemove = function () {
 		if (isDragging) handlePointerEvent(true);
 	};
-
+	document.onkeydown = function () {
+		console.log("keydown");
+		updateShipPosition();
+	};
 	return (
 		<group visible={true}>
-			<mesh ref={ref} material={material} rotation={[-Math.PI/2,0,0]}>
-				<planeGeometry args={[5,5,64,64]} />
+			<mesh ref={ref} material={material} rotation={[-Math.PI / 2, 0, 0]}>
+				<planeGeometry args={[3, 3, 64, 64]} />
 			</mesh>
 		</group>
 	);
 }
-
