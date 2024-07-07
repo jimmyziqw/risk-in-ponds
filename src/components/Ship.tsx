@@ -1,10 +1,12 @@
 import { useRef, useEffect, MutableRefObject } from "react";
-import { useFrame } from "@react-three/fiber";
+import { useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three";
 import { useNodes } from "../utils/useNode";
-const movingSpeed = 0.01;
 
-export function Ship({ shipRef }: { shipRef: MutableRefObject<THREE.Mesh | null> }) {
+const movingSpeed = 0.02;
+const rotationSpeed = 0.005;
+
+export function Ship({ shipRef }: { shipRef: MutableRefObject<THREE.Group | null> }) {
 	const duckMeshes = useNodes("duck");
 	const movement = useRef({
 		forward: false,
@@ -12,6 +14,11 @@ export function Ship({ shipRef }: { shipRef: MutableRefObject<THREE.Mesh | null>
 		left: false,
 		right: false,
 	});
+	const mouseMovement = useRef({
+		x: 0,
+		y: 0,
+	});
+	const { camera } = useThree();
 
 	useEffect(() => {
 		const handleKeyDown = (event: { key: any }) => {
@@ -51,12 +58,20 @@ export function Ship({ shipRef }: { shipRef: MutableRefObject<THREE.Mesh | null>
 					break;
 			}
 		};
+
+		const handleMouseMove = (event: MouseEvent) => {
+			mouseMovement.current.x = (event.clientX / window.innerWidth) * 2 - 1;
+			mouseMovement.current.y = -(event.clientY / window.innerHeight) * 2 + 1;
+		};
+
 		window.addEventListener("keydown", handleKeyDown);
 		window.addEventListener("keyup", handleKeyUp);
+		window.addEventListener("mousemove", handleMouseMove);
 
 		return () => {
 			window.removeEventListener("keydown", handleKeyDown);
 			window.removeEventListener("keyup", handleKeyUp);
+			window.removeEventListener("mousemove", handleMouseMove);
 		};
 	}, []);
 
@@ -64,15 +79,16 @@ export function Ship({ shipRef }: { shipRef: MutableRefObject<THREE.Mesh | null>
 		if (shipRef.current) {
 			const position = shipRef.current.position;
 			const rotation = shipRef.current.rotation;
+
 			if (movement.current.forward) {
 				position.z -= movingSpeed;
-				if (rotation.y != 0) {
+				if (rotation.y !== 0) {
 					rotation.y = 0;
 				}
 			}
 			if (movement.current.backward) {
 				position.z += movingSpeed;
-				if ((rotation.y! = Math.PI)) {
+				if (rotation.y !== Math.PI) {
 					rotation.y = Math.PI;
 				}
 			}
@@ -84,21 +100,30 @@ export function Ship({ shipRef }: { shipRef: MutableRefObject<THREE.Mesh | null>
 				position.x += movingSpeed;
 				rotation.y = (Math.PI / 2) * 3;
 			}
+
+			// Update the camera position and rotation
+			camera.position.copy(position).add(new THREE.Vector3(0, 1.3, 3));
+			camera.lookAt(position);
+
+			// Apply mouse movement to camera rotation
+			camera.rotation.y -= mouseMovement.current.x * rotationSpeed;
+			camera.rotation.x -= mouseMovement.current.y * rotationSpeed;
 		}
 	});
+
 	return (
 		<group ref={shipRef} position={[0, 0.15, 1]}>
-			<group scale={0.1} rotation={[0, -Math.PI / 2, 0]}>
+			<group scale={0.1} position={[0,0,0.2]} rotation={[0, -Math.PI / 2, 0]}>
 				{duckMeshes.map((node) => (
-				<mesh
-					geometry={node.geometry}
-					material={node.material}
-					position={node.position}
-					rotation={node.rotation}
-				/>
-			))}
+					<mesh
+						key={node.id}
+						geometry={node.geometry}
+						material={node.material}
+						position={node.position}
+						rotation={node.rotation}
+					/>
+				))}
 			</group>
-			
 		</group>
 	);
 }

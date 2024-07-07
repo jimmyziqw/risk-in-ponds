@@ -6,15 +6,13 @@ import vertexShader from "../shaders/framebuffer_vertex.glsl";
 import fragmentShader from "../shaders/framebuffer_fragment.glsl";
 import vs from "../shaders/pond_vertex.glsl";
 import fs from "../shaders/pond_fragment.glsl";
-
-  
-// const MemoWave = 
-export function Pond({ shipRef }: { shipRef: THREE.Mesh}) {
+const pondSize = 5;
+export function Pond({ shipRef }: { shipRef: React.RefObject<THREE.Group> }) {
 	const ref = useRef<THREE.Mesh>(null);
 	const { scene } = useThree();
 	const bufferScene = new THREE.Scene();
-	const floorTexture = useTexture("textures/sand.jpg");
-	const wallTexture = useTexture("textures/beigeWall.jpg");
+	const floorTexture = useTexture("textures/stone.jpg");
+	const wallTexture = useTexture("textures/sand.jpg");
 	const foamTexture = useTexture("textures/seaFoam2.jpg");
 	const petalTexture = useTexture("textures/petal.png");
 	petalTexture.flipY = false;
@@ -33,8 +31,8 @@ export function Pond({ shipRef }: { shipRef: THREE.Mesh}) {
 	const bufferUniforms = {
 		map: { value: null },
 		center: { value: new THREE.Vector2(0.0, 0.0) },
-		radius: { value: 0.01 },
-		strength: { value: 0.1 },
+		radius: { value: 0.015 },
+		strength: { value: 0.03 },
 		delta: { value: new THREE.Vector2(1 / 256, 1 / 256) },
 		isInit: { value: true },
 	};
@@ -49,6 +47,7 @@ export function Pond({ shipRef }: { shipRef: THREE.Mesh}) {
 		waveOn: { value: true },
 		transitionProgress: { value: 0 },
 		planePosition: { value: new THREE.Vector3(0, 1, 0) },
+		pondSize: {value: pondSize}
 	};
 
 	const material = new THREE.ShaderMaterial({
@@ -76,10 +75,11 @@ export function Pond({ shipRef }: { shipRef: THREE.Mesh}) {
 	const updateShipPosition = () => {
 		if (!ref.current || !shipRef.current) return;
 		const shipPosition = shipRef.current.position;
-		const material = bufferObject.material as THREE.ShaderMaterial;
-		const uv = new THREE.Vector2(shipPosition.x / 3 + 0.5, -shipPosition.z / 3 + 0.5);
 
-		if (Object.values(keyState).some(value => value)) {
+		const material = bufferObject.material as THREE.ShaderMaterial;
+		const uv = new THREE.Vector2(shipPosition.x / pondSize + 0.5, -shipPosition.z / pondSize + 0.5);
+
+		if (Object.values(keyState).some((value) => value)) {
 			material.uniforms.center.value = uv;
 			// console.log("key down")
 		} else {
@@ -88,18 +88,18 @@ export function Pond({ shipRef }: { shipRef: THREE.Mesh}) {
 	};
 
 	// useEffect(() => {
-		const handleKeyDown = (event: KeyboardEvent) => {
-			keyState[event.key] = true;
-			updateShipPosition();
-		};
+	const handleKeyDown = (event: KeyboardEvent) => {
+		keyState[event.key] = true;
+		updateShipPosition();
+	};
 
-		const handleKeyUp = (event: KeyboardEvent) => {
-			keyState[event.key] = false;
-			updateShipPosition();
-		};
+	const handleKeyUp = (event: KeyboardEvent) => {
+		keyState[event.key] = false;
+		updateShipPosition();
+	};
 
-		window.addEventListener('keydown', handleKeyDown);
-		window.addEventListener('keyup', handleKeyUp);
+	window.addEventListener("keydown", handleKeyDown);
+	window.addEventListener("keyup", handleKeyUp);
 
 	// 	return () => {
 	// 		window.removeEventListener('keydown', handleKeyDown);
@@ -128,15 +128,13 @@ export function Pond({ shipRef }: { shipRef: THREE.Mesh}) {
 			gl.setRenderTarget(null);
 			gl.render(scene, camera);
 		}
-
 		updateShipPosition(); // Update ship position every frame
 	});
-
 
 	return (
 		<group visible={true}>
 			<mesh ref={ref} material={material} rotation={[-Math.PI / 2, 0, 0]}>
-				<planeGeometry args={[3, 3, 64, 64]} />
+				<planeGeometry args={[pondSize, pondSize, 64, 64]} />
 			</mesh>
 		</group>
 	);
