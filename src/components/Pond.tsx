@@ -7,11 +7,13 @@ import fragmentShader from "../shaders/framebuffer_fragment.glsl";
 import vs from "../shaders/pond_vertex.glsl";
 import fs from "../shaders/pond_fragment.glsl";
 
+  
+// const MemoWave = 
 export function Pond({ shipRef }: { shipRef: THREE.Mesh}) {
 	const ref = useRef<THREE.Mesh>(null);
-	const { scene, raycaster, mouse, camera } = useThree();
+	const { scene } = useThree();
 	const bufferScene = new THREE.Scene();
-	const floorTexture = useTexture("textures/floor3.jpg");
+	const floorTexture = useTexture("textures/sand.jpg");
 	const wallTexture = useTexture("textures/beigeWall.jpg");
 	const foamTexture = useTexture("textures/seaFoam2.jpg");
 	const petalTexture = useTexture("textures/petal.png");
@@ -68,21 +70,6 @@ export function Pond({ shipRef }: { shipRef: THREE.Mesh}) {
 	let bufferObject = new THREE.Mesh(plane, bufferMaterial);
 	bufferScene.add(bufferObject);
 
-	const handlePointerEvent = (mouseDown: boolean) => {
-		if (!ref.current) return;
-		raycaster.setFromCamera(mouse, camera);
-		const intersects = raycaster.intersectObject(ref.current);
-		if (intersects && intersects.length > 0) {
-			const material = bufferObject.material as THREE.ShaderMaterial;
-			const uv = intersects[0].uv;
-			// console.log(uv)
-
-			// if (!mouseDown) {
-			// 	material.uniforms.center.value.set(null);
-			// } else material.uniforms.center.value = uv;
-		}
-	};
-
 	let time = 0;
 	const keyState: { [key: string]: boolean } = {};
 
@@ -100,7 +87,7 @@ export function Pond({ shipRef }: { shipRef: THREE.Mesh}) {
 		}
 	};
 
-	useEffect(() => {
+	// useEffect(() => {
 		const handleKeyDown = (event: KeyboardEvent) => {
 			keyState[event.key] = true;
 			updateShipPosition();
@@ -114,11 +101,11 @@ export function Pond({ shipRef }: { shipRef: THREE.Mesh}) {
 		window.addEventListener('keydown', handleKeyDown);
 		window.addEventListener('keyup', handleKeyUp);
 
-		return () => {
-			window.removeEventListener('keydown', handleKeyDown);
-			window.removeEventListener('keyup', handleKeyUp);
-		};
-	}, []);
+	// 	return () => {
+	// 		window.removeEventListener('keydown', handleKeyDown);
+	// 		window.removeEventListener('keyup', handleKeyUp);
+	// 	};
+	// }, []);
 
 	useFrame(({ gl, camera }, delta) => {
 		if (ref.current) {
@@ -142,22 +129,9 @@ export function Pond({ shipRef }: { shipRef: THREE.Mesh}) {
 			gl.render(scene, camera);
 		}
 
-		// Update ship position every frame
-		updateShipPosition();
+		updateShipPosition(); // Update ship position every frame
 	});
 
-	let isDragging = false;
-	document.onmousedown = function () {
-		handlePointerEvent(true);
-		isDragging = true;
-	};
-	document.onmouseup = function () {
-		handlePointerEvent(false);
-		isDragging = false;
-	};
-	document.onmousemove = function () {
-		if (isDragging) handlePointerEvent(true);
-	};
 
 	return (
 		<group visible={true}>
