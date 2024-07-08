@@ -80,27 +80,26 @@ export function Ship({ shipRef }: { shipRef: MutableRefObject<THREE.Group | null
 			const position = shipRef.current.position;
 			const rotation = shipRef.current.rotation;
 
-			if (movement.current.forward) {
-				position.z -= movingSpeed;
-				if (rotation.y !== 0) {
-					rotation.y = 0;
-				}
-			}
-			if (movement.current.backward) {
-				position.z += movingSpeed;
-				if (rotation.y !== Math.PI) {
-					rotation.y = Math.PI;
-				}
-			}
-			if (movement.current.left) {
-				position.x -= movingSpeed;
-				rotation.y = Math.PI / 2;
-			}
-			if (movement.current.right) {
-				position.x += movingSpeed;
-				rotation.y = (Math.PI / 2) * 3;
-			}
+			let moveX = 0;
+			let moveZ = 0;
 
+			if (movement.current.forward) moveZ -= 1;
+			if (movement.current.backward) moveZ += 1;
+			if (movement.current.left) moveX -= 1;
+			if (movement.current.right) moveX += 1;
+
+			// Normalize movement to handle diagonal movement
+			const length = Math.sqrt(moveX * moveX + moveZ * moveZ);
+			if (length > 0) {
+				moveX /= length;
+				moveZ /= length;
+			}
+			// console.log(moveX,moveZ)
+			position.x += moveX*movingSpeed;
+			position.z += moveZ*movingSpeed;
+			if (moveX !== 0 || moveZ !== 0) {
+				rotation.y = Math.atan2(moveX, moveZ)+Math.PI;
+			}
 			// Update the camera position and rotation
 			camera.position.copy(position).add(new THREE.Vector3(0, 1.3, 3));
 			camera.lookAt(position);
@@ -113,7 +112,7 @@ export function Ship({ shipRef }: { shipRef: MutableRefObject<THREE.Group | null
 
 	return (
 		<group ref={shipRef} position={[0, 0.15, 1]}>
-			<group scale={0.1} position={[0,0,0.2]} rotation={[0, -Math.PI / 2, 0]}>
+			<group scale={0.1} position={[0, 0, 0.2]} rotation={[0, -Math.PI / 2, 0]}>
 				{duckMeshes.map((node) => (
 					<mesh
 						key={node.id}

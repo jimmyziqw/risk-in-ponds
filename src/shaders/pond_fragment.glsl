@@ -1,6 +1,7 @@
 uniform sampler2D map;
 varying vec2 vUv;
 uniform sampler2D tiles[2];
+uniform sampler2D skyMap;
 uniform sampler2D petalMap;
 varying vec3 vPosition;
 uniform float transitionProgress;
@@ -56,20 +57,20 @@ vec3 getWallColor(vec3 point) { //hit
         float mixRatio = smoothstep(_mixDelta, 0.0, min(_uv.x, 1.0 - _uv.y));
         wallColor = mix(floorColor, wallBaseColor, mixRatio);
     } 
-      
-    //  float _delta = 0.000001; //check edge
-    // if(abs(point.x) > 1.5 - _delta) {
-    //     wallColor = texture(tiles[1], point.zy * 0.5 + 0.5).rgb;
-    //     normal = vec3(-point.x, 0.0, 0.0);
-
-    // } else if(abs(point.z) > 1.5 - _delta) {
-    //     wallColor = texture(tiles[1], point.xy * 0.5 + vec2(0.5, 0.5)).rgb;
-    //     normal = vec3(0.0, 0.0, -point.z);
-    // }
-
     return wallColor;
 }
-
+vec3 getSkyColor(vec3 point) { //hit
+    vec3 wallColor;
+    float _mixDelta = 0.02; //blender artifact with low frame buffer resolution
+    vec2 _uv = (vec2(point.x, point.z) / pondSize + 0.5);
+    vec3 skyColor = texture(skyMap, _uv).rgb;
+    //vec3 wallBaseColor = texture(tiles[1], _uv).rgb;
+    // if(_uv.x < _mixDelta || _uv.y > 1.0 - _mixDelta) { //smooth color at edge
+    //     float mixRatio = smoothstep(_mixDelta, 0.0, min(_uv.x, 1.0 - _uv.y));
+    //     skyColor = mix(floorColor, wallBaseColor, mixRatio);
+    // } 
+    return skyColor;
+}
 // vec3 getDeskColor(vec3 point, vec3 color, vec3 origin, vec3 ray) {
 //     vec3 deskCenter = vec3(-0.0, 0.5, 0.0);
 //     vec3 deskSize = vec3(0.673, 0.5, 0.32);
@@ -122,7 +123,12 @@ vec3 getSurfaceRayColor(vec3 origin, vec3 light, vec3 ray, vec3 waterColor, vec3
         // }
 
     } else {
-        vec3 specularColor = vec3(0.7, 0.8, 0.6);
+        float displacement = 4.0;
+        vec2 t = intersectCube(origin, ray, vec3(-l+displacement, floorHeight, -w), vec3(l+displacement, 1.2, w));
+        color = vec3(origin + ray * t.y);
+        vec3 point = origin + ray * t.y;
+        color = getSkyColor(point);
+        //color = vec3(0.84, 0.12, 0.12);
     }
     return color;
 }

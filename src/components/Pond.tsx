@@ -15,6 +15,8 @@ export function Pond({ shipRef }: { shipRef: React.RefObject<THREE.Group> }) {
 	const wallTexture = useTexture("textures/sand.jpg");
 	const foamTexture = useTexture("textures/seaFoam2.jpg");
 	const petalTexture = useTexture("textures/petal.png");
+	const skyTexture = useTexture("textures/skyTree.jpg");
+
 	petalTexture.flipY = false;
 	let read = new THREE.WebGLRenderTarget(1024, 1024, {
 		minFilter: THREE.LinearFilter,
@@ -44,6 +46,8 @@ export function Pond({ shipRef }: { shipRef: React.RefObject<THREE.Group> }) {
 		time: { value: 0 },
 		foamMap: { value: foamTexture },
 		petalMap: { value: petalTexture },
+		skyMap: { value: skyTexture },
+
 		waveOn: { value: true },
 		transitionProgress: { value: 0 },
 		planePosition: { value: new THREE.Vector3(0, 1, 0) },
