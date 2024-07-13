@@ -6,17 +6,19 @@ import vertexShader from "../shaders/framebuffer_vertex.glsl";
 import fragmentShader from "../shaders/framebuffer_fragment.glsl";
 import vs from "../shaders/pond_vertex.glsl";
 import fs from "../shaders/pond_fragment.glsl";
-const pondSize = 5;
+const pondSize = 6;
 export function Pond({ shipRef }: { shipRef: React.RefObject<THREE.Group> }) {
 	const ref = useRef<THREE.Mesh>(null);
 	const { scene } = useThree();
 	const bufferScene = new THREE.Scene();
-	const floorTexture = useTexture("textures/stone.jpg");
 	const wallTexture = useTexture("textures/sand.jpg");
 	const foamTexture = useTexture("textures/seaFoam2.jpg");
 	const petalTexture = useTexture("textures/petal.png");
 	const skyTexture = useTexture("textures/skyTree.jpg");
-
+	const floorTexture = useTexture("textures/stone.jpg");
+	floorTexture.wrapS = THREE.RepeatWrapping;
+	floorTexture.wrapT = THREE.RepeatWrapping;
+	floorTexture.repeat.set(4, 4); // scale factor
 	petalTexture.flipY = false;
 	let read = new THREE.WebGLRenderTarget(1024, 1024, {
 		minFilter: THREE.LinearFilter,

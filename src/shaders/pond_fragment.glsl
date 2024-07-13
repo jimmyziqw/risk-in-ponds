@@ -47,10 +47,11 @@ vec2 intersectCube(vec3 origin, vec3 ray, vec3 cubeMin, vec3 cubeMax) {
 // }
 
 vec3 getWallColor(vec3 point) { //hit
+    float TEXTURE_REPEAT_SCALE = 6.0;
     vec3 wallColor;
     float _mixDelta = 0.02; //blender artifact with low frame buffer resolution
     vec2 _uv = (vec2(point.x, point.z) / pondSize + 0.5);
-    vec3 floorColor = texture(tiles[0], _uv).rgb;
+    vec3 floorColor = texture(tiles[0], _uv* TEXTURE_REPEAT_SCALE).rgb;
     vec3 wallBaseColor = texture(tiles[1], _uv).rgb;
     wallColor = floorColor;
     if(_uv.x < _mixDelta || _uv.y > 1.0 - _mixDelta) { //smooth color at edge
@@ -59,6 +60,7 @@ vec3 getWallColor(vec3 point) { //hit
     } 
     return wallColor;
 }
+
 vec3 getSkyColor(vec3 point) { //hit
     vec3 wallColor;
     float _mixDelta = 0.02; //blender artifact with low frame buffer resolution

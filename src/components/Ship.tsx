@@ -101,7 +101,7 @@ export function Ship({ shipRef }: { shipRef: MutableRefObject<THREE.Group | null
 				rotation.y = Math.atan2(moveX, moveZ)+Math.PI;
 			}
 			// Update the camera position and rotation
-			camera.position.copy(position).add(new THREE.Vector3(0, 1.3, 3));
+			camera.position.copy(position).add(new THREE.Vector3(0, 1.3, 4));
 			camera.lookAt(position);
 
 			// Apply mouse movement to camera rotation
@@ -112,7 +112,7 @@ export function Ship({ shipRef }: { shipRef: MutableRefObject<THREE.Group | null
 
 	return (
 		<group ref={shipRef} position={[0, 0.15, 1]}>
-			<group scale={0.1} position={[0, 0, 0.2]} rotation={[0, -Math.PI / 2, 0]}>
+			<group scale={0.15} position={[0, 0, 0.05]} rotation={[0, -Math.PI / 2, 0]}>
 				{duckMeshes.map((node) => (
 					<mesh
 						key={node.id}

@@ -4,7 +4,6 @@ import { Scene } from "./Scene";
 import { Environment, OrbitControls } from "@react-three/drei";
 // import { OrbitControls } from "@react-three/drei";
 function App() {
-	console.log('wokring')
 	return (
 		<>
 			<Canvas
@@ -17,7 +16,7 @@ function App() {
 					fov: 40,
 				}}
 			>
-				<ambientLight />
+				{/* <ambientLight intensity={0.3}/> */}
 				{/* <directionalLight position={[-1,1,1]} intensity={2}/> */}
 				<Scene />
 				<Environment files="textures/puresky_1k.hdr" background/>
